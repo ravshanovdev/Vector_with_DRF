@@ -1,0 +1,12 @@
+1. install corsheaders # done
+2. cache files # done
+3. add function "share post"
+4. like and dislike # done
+5. create blog or channel like YouTube or Quora
+6.1 create Question, Answer models # done
+6.2 and their views and urls
+7.
+
+
+
+{"non_field_errors":["Invalid data. Expected a dictionary, but got Post."]}
