@@ -1,22 +1,76 @@
 from django.db import IntegrityError
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from .models import Post, Comment
+
+from .models import Post, Comment, Channel
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import CommentSerializer, PostSerializer
+from .serializers import CommentSerializer, PostSerializer, ChannelSerializer, ReadOnlyPostSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.views.decorators.cache import cache_page
-from rest_framework.decorators import action
+
 from rest_framework.response import Response
-# from cacheops import cached_view_as, cached_as
+
 
 # share post not yet...
+
+# views for channel model
+# create_channel
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_channel(request):
+    created_by = request.user
+
+    try:
+        serializer = ChannelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=created_by)
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response(str(e))
+
+
+class ListChannelApiView(ListAPIView):
+    queryset = Channel.objects.all()
+    serializer_class = ChannelSerializer
+
+
+# detail Channel
+@api_view(['GET'])
+def get_channel(request, pk):
+
+    try:
+        channel = Channel.objects.get(pk=pk)
+        posts = Post.objects.filter(channel=channel)
+        serializer = ChannelSerializer(channel)
+        serializers = PostSerializer(posts, many=True)
+        return Response({
+            "channel": serializer.data,
+            "posts": serializers.data
+        })
+
+    except Channel.DoesNotExist:
+        return Response({"message": "Channel Not Found.!"}, status.HTTP_404_NOT_FOUND)
+
+
+# delete channel
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_channel(request, pk):
+    try:
+        channel = Channel.objects.get(pk=pk, user=request.user)
+
+    except Channel.DoesNotExist:
+        return Response({"message": 'Channel Not Found.!'}, status.HTTP_404_NOT_FOUND)
+
+    channel.delete()
+
+    return Response({"message": "Channel Successfully Deleted.!"})
 
 
 # create
@@ -38,10 +92,9 @@ def create_post_api_view(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# show list and search posts for title and body. This searching code not yet over.
 class PostAPiView(ListAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = ReadOnlyPostSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ['id', 'title', "body"]
     search_fields = ['title', 'body']
@@ -63,7 +116,7 @@ class PostDetailApiView(APIView):
 
 
 # get your posts
-@cache_page(60*10)
+@cache_page(60 * 10)
 @api_view(['GET'])
 def get_post(request):
     if request.user.is_authenticated:

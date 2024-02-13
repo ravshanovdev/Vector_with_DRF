@@ -103,9 +103,61 @@ class AnswerAnyQuestionApiView(APIView):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+# see all answers
 class AnswerListApiView(ListAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_answer(request, pk):
+
+    try:
+        answer = Answer.objects.get(id=pk, created_by=request.user)
+
+    except Answer.DoesNotExist:
+        return Response({"error": "Answer Not Found.!"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = AnswerSerializer(answer, data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+# delete answer
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_answer(request, pk):
+
+    try:
+        answer = Answer.objects.get(id=pk, created_by=request.user)
+        answer.delete()
+        return Response({'message': "answer successfully deleted.!"})
+    except Answer.DoesNotExist:
+        return Response({"error": "Answer Not Found.!"}, status=status.HTTP_404_NOT_FOUND)
+
+
+# see detail answer
+class SeeYourAnswerApiView(APIView):
+
+    def get(self, request, pk):
+        try:
+            answer = Answer.objects.get(id=pk)
+
+        except Answer.DoesNotExist:
+            return Response({"error": "Answer Not Found.!"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AnswerSerializer(answer)
+
+        return Response(serializer.data)
+
+
+
+
 
 
 

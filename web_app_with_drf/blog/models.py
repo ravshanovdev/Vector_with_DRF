@@ -2,7 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Channel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=250)
+    description = models.CharField(max_length=500)
+    banner_image = models.ImageField(upload_to='images/', blank=True, null=True)
+
+
 class Post(models.Model):
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     photo = models.ImageField(upload_to='images/', blank=True, null=True)
     video = models.FileField(upload_to='videos/', blank=True, null=True)
