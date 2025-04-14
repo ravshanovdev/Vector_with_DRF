@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+pillow = "*"
+django-filter = "*"
+django-redis = "*"
+django-rest-framework-social-oauth2 = "*"
+django-social-share = "*"
+django-cors-headers = "*"
+django-cacheops = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
