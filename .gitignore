@@ -4,4 +4,4 @@ Pipfile.lock
 **/__pycache__/
 .idea/
 *.py[cod]
-web_app_with_drf_test/
+
