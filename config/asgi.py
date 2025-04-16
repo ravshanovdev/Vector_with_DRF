@@ -1,20 +1,27 @@
+
 import os
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-from channels.security.websocket import AllowedHostsOriginValidator
 
-from chats.routing import websocket_urlpatterns
+from django.urls import path
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+from channels.routing import ProtocolTypeRouter, URLRouter
 
-application = ProtocolTypeRouter(
-    {
-        "http": get_asgi_application(),
-        "websocket":
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+from channels.auth import AuthMiddlewareStack
+
+from chats.consumers import PersonalChatConsumer, OnlineStatusConsumer, NotificationConsumer
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'whatsapp_clone.settings')
+
+application = get_asgi_application()
 
 
-    }
-)
+application = ProtocolTypeRouter({
+    'websocket': AuthMiddlewareStack(
+        URLRouter([
+            path('ws/<int:id>/', PersonalChatConsumer),
+            path('ws/online/', OnlineStatusConsumer),
+            path('ws/notify/', NotificationConsumer)
+        ])
+    )
+})
