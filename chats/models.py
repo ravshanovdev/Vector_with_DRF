@@ -1,9 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class UserProfileModel(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(null=True, blank=True, max_length=150)
     online_status = models.BooleanField(default=False)
 
@@ -23,7 +23,7 @@ class ChatModel(models.Model):
 
 class ChatNotification(models.Model):
     chat = models.ForeignKey(to=ChatModel, on_delete=models.CASCADE)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_seen = models.BooleanField(default=False)
 
     def __str__(self) -> str:

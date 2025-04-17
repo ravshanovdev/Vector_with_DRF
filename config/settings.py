@@ -182,6 +182,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR.joinpath('media')
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # 'oauth2_provider',
 # 'social_django',
