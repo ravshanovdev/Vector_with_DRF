@@ -1,11 +1,16 @@
-# chat/urls.py
-
 from django.urls import path
-# from .views import CreateChatRoomView, ListChatRoomsView, ListMessagesView, SendMessageView
+from .views import (
+    ChatSendAPIView,
+    ChatListAPIView,
+    NotificationListAPIView,
+    MarkNotificationAsSeenAPIView,
+    UpdateOnlineStatusAPIView
+)
 
 urlpatterns = [
-    # path('rooms/', ListChatRoomsView.as_view(), name='chatroom-list'),
-    # path('rooms/create/', CreateChatRoomView.as_view(), name='chatroom-create'),
-    # path('rooms/<int:room_id>/messages/', ListMessagesView.as_view(), name='message-list'),
-    # path('messages/send/', SendMessageView.as_view(), name='message-send'),
+    path('api/send-chat/', ChatSendAPIView.as_view()),
+    path('api/chat/<str:thread_name>/', ChatListAPIView.as_view()),
+    path('api/notifications/', NotificationListAPIView.as_view()),
+    path('api/notifications/seen/<int:pk>/', MarkNotificationAsSeenAPIView.as_view()),
+    path('api/online-status/', UpdateOnlineStatusAPIView.as_view()),
 ]

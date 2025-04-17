@@ -1,27 +1,19 @@
-
+# project_name/asgi.py
 import os
-
-from django.core.asgi import get_asgi_application
-
-from django.urls import path
-
+import django
 from channels.routing import ProtocolTypeRouter, URLRouter
-
+from django.core.asgi import get_asgi_application
 from channels.auth import AuthMiddlewareStack
+from chats import routing
 
-from chats.consumers import PersonalChatConsumer, OnlineStatusConsumer, NotificationConsumer
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'whatsapp_clone.settings')
-
-application = get_asgi_application()
-
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
-        URLRouter([
-            path('ws/<int:id>/', PersonalChatConsumer),
-            path('ws/online/', OnlineStatusConsumer),
-            path('ws/notify/', NotificationConsumer)
-        ])
-    )
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            routing.websocket_urlpatterns
+        )
+    ),
 })
